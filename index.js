@@ -1,8 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const logger = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
@@ -20,19 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 
-// Session setup
-app.use(
-	session({
-		secret: process.env.SESSION_SECRET,
-		resave: false,
-		saveUninitialized: false,
-		store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-		cookie: { maxAge: 1000 * 60 * 60 * 24 },
-	})
-);
-
-app.use(morgan("dev"));
-// app.use(logger.stream);
+app.use(cookieParser());
+// app.use(morgan("dev")); // Replaced by morgan with winston stream
+app.use(morgan('combined', { stream: logger.stream }));
 
 // Routes
 app.use("/", authRoutes);

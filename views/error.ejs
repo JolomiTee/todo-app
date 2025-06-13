@@ -1,0 +1,26 @@
+<% // This view will be wrapped by layout.ejs, so no need for html/body/header/footer here %>
+
+<div class="text-center">
+    <h2>Oops! Something went wrong.</h2>
+    <p class="error-message" style="display: inline-block; margin-top: 10px; margin-bottom:20px;"><%= message %></p>
+</div>
+
+<% if (typeof error !== 'undefined' && error && error.status) { %>
+    <p class="text-center">Status Code: <%= error.status %></p>
+<% } %>
+
+<%
+// Show stack trace only in development
+// Note: For this to work, process.env.NODE_ENV must be available in EJS templates.
+// This is often achieved by setting app.locals.NODE_ENV = process.env.NODE_ENV in index.js or similar.
+// Assuming 'development' as a fallback if NODE_ENV is not explicitly passed or available globally.
+const showStack = typeof NODE_ENV !== 'undefined' ? NODE_ENV === 'development' : true;
+if (showStack && typeof error !== 'undefined' && error && error.stack) {
+%>
+    <h3>Stack Trace:</h3>
+    <pre style="background-color: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto;"><%= error.stack %></pre>
+<% } %>
+
+<div class="text-center" style="margin-top: 20px;">
+    <a href="/" class="btn">Go to Homepage</a>
+</div>
