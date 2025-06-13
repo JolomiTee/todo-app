@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard</title>
+</head>
+<body>
+	<form method="GET">
+		<select name="status" onchange="this.form.submit()">
+			<option value="">All</option>
+			<option value="pending">Pending</option>
+			<option value="completed">Completed</option>
+		</select>
+	</form>
+
+	<ul>
+		<% tasks.forEach(task=> { %>
+			<li>
+				<%= task.title %> - <%= task.status %>
+						<% if(task.status !=='completed' ) { %>
+							<form method="POST" action="/tasks/<%= task._id %>/status">
+								<input type="hidden" name="status" value="completed">
+								<button>Mark as Completed</button>
+							</form>
+							<% } %>
+			</li>
+			<% }) %>
+	</ul>
+
+	<h3>Add Task</h3>
+	<form method="POST" action="/tasks">
+		<input name="title" placeholder="Title" required>
+		<input name="description" placeholder="Description">
+		<button type="submit">Add</button>
+	</form>
+
+	<div>.</div>
+	<div>.</div>
+	<div>.</div>
+
+	<a href="/logout">Logout</a>
+</body>
+</html>
