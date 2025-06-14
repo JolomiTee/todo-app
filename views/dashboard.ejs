@@ -1,5 +1,18 @@
-<h2 class="text-center">Task Dashboard</h2>
+<div style="display: flex; justify-content: space-between; align-items: center;">
 
+	<h2>Task Dashboard
+		<% if (user) { %>
+			<button>
+				<b>
+					<%= user.username %>
+				</b>
+			</button>
+			<% } %>
+	</h2>
+	<form action="/logout" method="POST" style="">
+		<button type="submit">Logout</button>
+	</form>
+	</div>
 <div style="margin-bottom: 20px;">
     <form method="GET" action="/tasks" class="filter-form">
         <label for="status-filter">Filter by status:</label>
