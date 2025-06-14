@@ -1,50 +1,77 @@
-const User = require("../models/User");
+const User = require("../models/user.model");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const logger = require("../middleware/logger"); // Added logger
+const { generateToken } = require("../utils/jwt");
 
-exports.register = async (req, res, next) => {
+const signup = async (req, res) => {
 	try {
-		const { username, password } = req.body;
-		const user = await User.create({ username, password });
-		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || "DEFAULT_JWT_SECRET_REPLACE_THIS", {
-			expiresIn: "1h",
-		});
-		res.cookie("token", token, { httpOnly: true, maxAge: 3600000 }); // 1 hour
-		logger.info('User registered successfully', { userId: user._id, username: user.username });
-		res.redirect("/tasks");
-	} catch (err) {
-		// Adding error logging before passing to next error handler
-		logger.error(`Error during user registration for ${req.body.username}: ${err.message}`, { stack: err.stack, username: req.body.username });
-		next(err);
-	}
-};
+		const { username, email_address, password } = req.body;
 
-exports.login = async (req, res, next) => {
-	try {
-		const { username, password } = req.body;
-		const user = await User.findOne({ username });
-		if (!user || !(await user.comparePassword(password))) {
-			logger.warn('Failed login attempt', { username: req.body.username });
-			return res.render("login", { error: "Invalid credentials" });
+		const existingUser = await User.findOne({ email_address });
+		if (existingUser) {
+			return res.status(400).json({ message: "User already exists" });
 		}
-		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || "DEFAULT_JWT_SECRET_REPLACE_THIS", {
-			expiresIn: "1h",
+
+		const user = await User.create({
+			username,
+			email_address,
+			password,
 		});
-		res.cookie("token", token, { httpOnly: true, maxAge: 3600000 }); // 1 hour
-		logger.info('User logged in successfully', { userId: user._id, username: user.username });
-		res.redirect("/tasks");
-	} catch (err) {
-		// Adding error logging
-		logger.error(`Error during user login for ${req.body.username}: ${err.message}`, { stack: err.stack, username: req.body.username });
-		next(err);
+
+		const token = generateToken(user);
+
+		res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
+
+		res.redirect("/tasks?signup=success");
+		// testing with postman
+		// res.status(201).json({
+		// 	token,
+		// 	message: "New user created",
+		// });
+	} catch (error) {
+		res.status(500).json({
+			message: "Error creating user",
+			error: error.message,
+		});
 	}
 };
 
-exports.logout = (req, res) => {
-	// req.user might not be available if token was already cleared or invalid
-	// but if it is, log who is logging out.
-	const userId = req.user ? req.user.userId : 'unknown';
-	logger.info('User logged out', { userId });
-	res.cookie("token", "", { httpOnly: true, expires: new Date(0) });
-	res.redirect("/login");
+const login = async (req, res) => {
+	try {
+		const { email_address, password } = req.body;
+
+		const user = await User.findOne({ email_address });
+		if (!user) {
+			return res.status(401).json({ message: "Invalid credentials" });
+		}
+
+		const isPasswordValid = await user.comparePassword(password);
+		if (!isPasswordValid) {
+			return res.status(401).json({ message: "Invalid credentials" });
+		}
+
+		const token = generateToken(user);
+		res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
+		res.redirect("/tasks?login=true");
+	} catch (error) {
+		res.status(500).json({
+			message: "Error logging in",
+			error: error.message,
+		});
+	}
+};
+
+const logout = async (req, res) => {
+	res.clearCookie("token");
+
+	res.redirect("/?logout=true");
+
+	// res.status(200).json({
+	// 	message: "User logged out",
+	// });
+};
+module.exports = {
+	signup,
+	login,
+	logout,
 };
