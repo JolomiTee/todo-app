@@ -1,16 +1,23 @@
-<!-- <%- include('./partials/header', {
-	 title: 'Home' ,
+<%- include('./partials/header', {
+	 title,
 	 user
-	 }) %> -->
+	 }) %>
 
-	<h2>Welcome to the Task Manager App</h2>
 
-	<nav class="navlist">
-		<a href="/login">Login</a>
-		<a href="/signup">Signup</a>
-	</nav>
+	<% if (!user) { %>
+		<nav class="navlist">
+			<a href="/login">Login</a>
+			<a href="/signup">Signup</a>
+		</nav>
+		<% } %>
 
-	<p></p>
+			<% if (user) { %>
+				<nav class="navlist">
+					<a href="/tasks">Go to Tasks</a>
+			
+				</nav>
+				<% } %>
+
 
 
 

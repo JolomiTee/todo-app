@@ -1,4 +1,12 @@
-<h2>Register</h2>
+<%- include('./partials/header', {
+	 title,
+	 user
+	 }) %>
+
+
+	<h2>
+		<%= title %>
+	</h2>
 
 <% if (typeof error !=='undefined' && error) { %>
 	<div class="error-message">
@@ -25,3 +33,4 @@
 		<p class="text-center" style="margin-top: 1rem;">
 			Already have an account? <a href="/login">Login here</a>
 		</p>
+<%- include('./partials/footer') %>

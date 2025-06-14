@@ -11,7 +11,7 @@
 			justify-content: space-between;
 			align-items: center;
 		}
-	
+
 		.navlinks {
 			display: flex;
 			align-items: center;
@@ -20,31 +20,33 @@
 	</style>
 </head>
 <body>
-	<nav class="nav">
-		<h1>
-			<a href="/">Task Manager</a>
-		</h1>
-	
-		<% if (user) { %>
-			<button>
-				<b>
-					<%= user.username %>
-				</b>
-			</button>
-			<% } %>
-	
-				<nav class="navlinks">
-					<% if (user) { %>
-						<a href="/task">All Tasks</a>
-						<a href="/task/create">Create Task</a>
-						<form action="/logout" method="POST" style="display: inline;">
-							<button type="submit">Logout</button>
+	<nav class="nav" style="width: 100%;">
+		<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+
+			<h2>
+				<%= title %>
+					<% if (user.username) { %>
+						<button>
+							<b>
+								<%= user.username %>
+							</b>
+						</button>
+						<% } %>
+			</h2>
+
+			<div class="navlinks">
+				<% if (user.username) { %>
+					<form action="/auth/logout" method="POST">
+						<button type="submit">Logout</button>
 						</form>
-						<% } else { %>
-							<a href="/login">Login</a>
-							<a href="/signup">Signup</a>
-							<% } %>
-				</nav>
+					<% } else { %>
+						<a href="/login">Login</a>
+						<a href="/register">Register</a>
+						<% } %>
+			</div>
+			
+			</div>
+
 	</nav>
 
     <div class="container">
